@@ -2,7 +2,7 @@
 
 import json
 
-with open(r"C:\Users\Home\Desktop\weather-py\codes.json") as obj:
+with open("codes.json") as obj:
 	data = json.load(obj)
 
 def lookup(name):
