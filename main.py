@@ -13,96 +13,56 @@ def lookup(name):
 		data = json.load(obj)
 
 	for indc in range(len(data)):
-		if data[indc]["name"] == name:
+		if data[indc]["name"].lower() == name.lower():
 			return data[indc]["alpha-2"]
-	else:
-		return "Please enter a valid country name"
+
+	return "Please enter a valid country name"
+
+def printData(query_url,tempUnit):
+	data = get(query_url)
+	try:
+		print(f'''
+City name: {data['name']}
+Country: {data['sys']['country']}
+Condition: {data["weather"][0]["main"]}
+Temperature: {data["main"]["temp"]}{tempUnit}
+Humidity: {data["main"]["humidity"]}%
+Minimum Temperature: {data["main"]["temp_min"]}{tempUnit}
+Maximum Temperature: {data["main"]["temp_max"]}{tempUnit}
+''')
+	except KeyError:
+		print("Please enter a valid city name")	
+
+def main():
+	while True:
+		print('''1: Get details in Kelvin
+2: Get details in Celcius
+3: Get details in Fahrenheit
+4: Quit''')
+		choice = int(input("Enter choice: "))
+		if choice == 4:	break
+		else: 
+			city = input("Enter your city name: ")
+			country_name = input("Enter your country name: ")
+			country_code = lookup(country_name)
+			base_url = f"https://api.openweathermap.org/data/2.5/weather?q={city},{country_code}&appid=eb005e534aed278632f85a66a668ccf0"
+
+			if choice ==1: 				printData(base_url, "K")
+			elif choice == 2:			printData(base_url + "&units=metric", "°C")
+			elif choice ==3 :			printData(base_url + "&units=imperial", "°F")
+			else:						print("Please enter a valid choice!")
+
+if __name__ =="__main__":
+	main()
 
 
-print("Find the weather of any city!")
-print()
 
-while True:
-	print("1. Find weather")
-	print("2. Find country code")
-	print("3. Quit")
-	choice = int(input("Enter choice: "))
+		
+'''To make sumlimerepl work: store as python-repl.sublime-build
+{
+    "target": "run_existing_window_command", 
+    "id": "repl_python_run",
+    "file": "config/Python/Main.sublime-menu"
+}
+'''
 
-	if choice==1:
-		print()
-		print("Which format would you like to get the weather in?")
-		print("1. Kelvin")
-		print("2. Celsius")
-		print("3. Fahrenheit")
-		print()
-
-		choice_form = int(input("Enter format: "))
-		city = input("Enter your city name: ")
-		country_code = input("Enter ISO 3166 alpha-2 code of your country: ")
-
-		base_url = f"https://api.openweathermap.org/data/2.5/weather?q={city},{country_code}&appid=eb005e534aed278632f85a66a668ccf0"
-
-		if choice_form ==1:
-			query_url = base_url
-			data = get(query_url)
-			area = data['name']
-			country = data['sys']['country']
-			cond = data['weather'][0]['main']
-			temp = data['main']['temp']
-			humid = data['main']['humidity']
-			min_temp = data['main']['temp_min']
-			max_temp = data['main']['temp_max']
-
-			print("City name: ",area)
-			print("Country: ",country)
-			print("Condition: ",cond)
-			print(f"Temperature: {temp}"+"°K")
-			print(f"Humidity: {humid}"+"%")
-			print(f"Minimum Temperature: {min_temp}"+"°K")
-			print(f"Maximum Temperature: {max_temp}"+"°K")
-			print()
-		elif choice_form == 2:
-			query_url = base_url + "&units=metric"
-			data = get(query_url)
-			area = data['name']
-			country = data['sys']['country']
-			cond = data['weather'][0]['main']
-			temp = data['main']['temp']
-			humid = data['main']['humidity']
-			min_temp = data['main']['temp_min']
-			max_temp = data['main']['temp_max']
-
-			print("City name: ",area)
-			print("Country: ",country)
-			print("Condition: ",cond)
-			print(f"Temperature: {temp}"+"°C")
-			print(f"Humidity: {humid}"+"%")
-			print(f"Minimum Temperature: {min_temp}"+"°C")
-			print(f"Maximum Temperature: {max_temp}"+"°C")
-			print()
-		else:
-			query_url = base_url + "&units=imperial"
-			data = get(query_url)
-			area = data['name']
-			country = data['sys']['country']
-			cond = data['weather'][0]['main']
-			temp = data['main']['temp']
-			humid = data['main']['humidity']
-			min_temp = data['main']['temp_min']
-			max_temp = data['main']['temp_max']
-
-			print("City name: ",area)
-			print("Country: ",country)
-			print("Condition: ",cond)
-			print(f"Temperature: {temp}"+"°F")
-			print(f"Humidity: {humid}"+"%")
-			print(f"Minimum Temperature: {min_temp}"+"°F")
-			print(f"Maximum Temperature: {max_temp}"+"°F")
-			print()
-	elif choice==2:
-		country_name = input("Enter your country name to get ISO 3166 alpha-2 code of your country: ")
-		print("Code: ",lookup(country_name))
-	elif choice==3:
-		break
-	else:
-		print("Please enter a valid choice!")
